@@ -14,19 +14,19 @@ Route::post('/notes', [NoteController::class, 'store'])
     ->name('notes.store');
 
 Route::put('/notes/{note}', [NoteController::class, 'update'])
-    ->middleware('auth')
+    ->can('update', 'note')
     ->name('notes.update');
 
 Route::delete('/notes/{note}', [NoteController::class, 'destroy'])
-    ->middleware('auth')
+    ->can('forceDelete', 'note')
     ->name('notes.destroy');
 
 Route::put('/notes/{note}/archive', [ArchivedNoteController::class, 'store'])
-    ->middleware('auth')
+    ->can('delete', 'note')
     ->name('archived-notes.store');
 
 Route::put('/notes/{note}/restore', [ArchivedNoteController::class, 'destroy'])
-    ->middleware('auth')
+    ->can('restore', 'note')
     ->name('archived-notes.destroy')
     ->withTrashed();
 

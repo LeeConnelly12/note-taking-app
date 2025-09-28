@@ -86,3 +86,53 @@ test('notes can be restored', function () {
 
     assertNotSoftDeleted($note);
 });
+
+test('users can only update their own notes', function () {
+    $note = Note::factory()
+        ->for($this->user)
+        ->create();
+
+    $otherUser = User::factory()->create();
+
+    actingAs($otherUser)
+        ->put("/notes/{$note->id}", [
+            'title' => 'updated title',
+            'content' => 'updated content',
+        ])->assertForbidden();
+});
+
+test('users can only delete their own notes', function () {
+    $note = Note::factory()
+        ->for($this->user)
+        ->create();
+
+    $otherUser = User::factory()->create();
+
+    actingAs($otherUser)
+        ->delete("/notes/{$note->id}")
+        ->assertForbidden();
+});
+
+test('users can only archive their own notes', function () {
+    $note = Note::factory()
+        ->for($this->user)
+        ->create();
+
+    $otherUser = User::factory()->create();
+
+    actingAs($otherUser)
+        ->put("/notes/{$note->id}/archive")
+        ->assertForbidden();
+});
+
+test('users can only restore their own notes', function () {
+    $note = Note::factory()
+        ->for($this->user)
+        ->create();
+
+    $otherUser = User::factory()->create();
+
+    actingAs($otherUser)
+        ->put("/notes/{$note->id}/restore")
+        ->assertForbidden();
+});
