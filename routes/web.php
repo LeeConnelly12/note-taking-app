@@ -27,7 +27,8 @@ Route::put('/notes/{note}/archive', [ArchivedNoteController::class, 'store'])
 
 Route::put('/notes/{note}/restore', [ArchivedNoteController::class, 'destroy'])
     ->middleware('auth')
-    ->name('archived-notes.destroy');
+    ->name('archived-notes.destroy')
+    ->withTrashed();
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');

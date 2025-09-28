@@ -6,25 +6,25 @@ use App\Models\User;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\delete;
-use function Pest\Laravel\get;
-use function Pest\Laravel\post;
-use function Pest\Laravel\put;
+use function Pest\Laravel\assertNotSoftDeleted;
+use function Pest\Laravel\assertSoftDeleted;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
-    actingAs($this->user);
 });
 
 test('notes screen can be rendered', function () {
-    get('/')->assertOk();
+    actingAs($this->user)
+        ->get('/')
+        ->assertOk();
 });
 
 test('notes can be created', function () {
-    post('/notes', [
-        'title' => 'new note',
-        'content' => 'new note content',
-    ])->assertRedirectBack();
+    actingAs($this->user)
+        ->post('/notes', [
+            'title' => 'new note',
+            'content' => 'new note content',
+        ])->assertRedirectBack();
 
     assertDatabaseHas(Note::class, [
         'title' => 'new note',
@@ -37,10 +37,11 @@ test('notes can be updated', function () {
         ->for($this->user)
         ->create();
 
-    put("/notes/{$note->id}", [
-        'title' => 'updated title',
-        'content' => 'updated content',
-    ])->assertRedirectBack();
+    actingAs($this->user)
+        ->put("/notes/{$note->id}", [
+            'title' => 'updated title',
+            'content' => 'updated content',
+        ])->assertRedirectBack();
 
     assertDatabaseHas(Note::class, [
         'title' => 'updated title',
@@ -53,7 +54,9 @@ test('notes can be deleted', function () {
         ->for($this->user)
         ->create();
 
-    delete("/notes/{$note->id}")->assertRedirectBack();
+    actingAs($this->user)
+        ->delete("/notes/{$note->id}")
+        ->assertRedirectBack();
 
     assertDatabaseEmpty(Note::class);
 });
@@ -61,27 +64,25 @@ test('notes can be deleted', function () {
 test('notes can be archived', function () {
     $note = Note::factory()
         ->for($this->user)
-        ->create([
-            'is_archived' => false,
-        ]);
+        ->create();
 
-    put("/notes/{$note->id}/archive")->assertRedirectBack();
+    actingAs($this->user)
+        ->put("/notes/{$note->id}/archive")
+        ->assertRedirectBack();
 
-    assertDatabaseHas(Note::class, [
-        'is_archived' => true,
-    ]);
+    assertSoftDeleted($note);
 });
 
 test('notes can be restored', function () {
     $note = Note::factory()
         ->for($this->user)
         ->create([
-            'is_archived' => true,
+            'deleted_at' => now(),
         ]);
 
-    put("/notes/{$note->id}/restore")->assertRedirectBack();
+    actingAs($this->user)
+        ->put("/notes/{$note->id}/restore")
+        ->assertRedirectBack();
 
-    assertDatabaseHas(Note::class, [
-        'is_archived' => false,
-    ]);
+    assertNotSoftDeleted($note);
 });

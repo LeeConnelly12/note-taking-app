@@ -12,9 +12,7 @@ class ArchivedNoteController extends Controller
      */
     public function store(Request $request, Note $note)
     {
-        $note->update([
-            'is_archived' => true,
-        ]);
+        $note->delete();
 
         return back();
     }
@@ -24,9 +22,7 @@ class ArchivedNoteController extends Controller
      */
     public function destroy(Note $note)
     {
-        $note->update([
-            'is_archived' => false,
-        ]);
+        $note->restore();
 
         return back();
     }

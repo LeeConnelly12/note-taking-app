@@ -19,7 +19,6 @@ class NoteFactory extends Factory
         return [
             'title' => fake()->text(25),
             'content' => fake()->text(),
-            'is_archived' => fake()->boolean(),
         ];
     }
 }
