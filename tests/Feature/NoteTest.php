@@ -1,11 +1,11 @@
 <?php
 
 use App\Models\Note;
+use App\Models\Tag;
 use App\Models\User;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseEmpty;
-use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertNotSoftDeleted;
 use function Pest\Laravel\assertSoftDeleted;
 
@@ -20,33 +20,40 @@ test('notes screen can be rendered', function () {
 });
 
 test('notes can be created', function () {
+    $tags = Tag::factory()->count(2)->create();
+
     actingAs($this->user)
         ->post('/notes', [
             'title' => 'new note',
+            'tags' => $tags->toArray(),
             'content' => 'new note content',
-        ])->assertRedirectBack();
+        ])->assertRedirectBackWithoutErrors();
 
-    assertDatabaseHas(Note::class, [
-        'title' => 'new note',
-        'content' => 'new note content',
-    ]);
+    $note = Note::where('title', 'new note')->first();
+    expect($note->tags()->count())->toBe(2);
+    expect($note->content)->toBe('new note content');
 });
 
 test('notes can be updated', function () {
     $note = Note::factory()
         ->for($this->user)
+        ->hasTags(2)
         ->create();
+
+    $tag = Tag::factory()->create([
+        'name' => 'new tag',
+    ]);
 
     actingAs($this->user)
         ->put("/notes/{$note->id}", [
             'title' => 'updated title',
+            'tags' => [$tag],
             'content' => 'updated content',
-        ])->assertRedirectBack();
+        ])->assertRedirectBackWithoutErrors();
 
-    assertDatabaseHas(Note::class, [
-        'title' => 'updated title',
-        'content' => 'updated content',
-    ]);
+    $note = Note::where('title', 'updated title')->first();
+    expect($note->tags()->count())->toBe(1);
+    expect($note->content)->toBe('updated content');
 });
 
 test('notes can be deleted', function () {
@@ -56,7 +63,7 @@ test('notes can be deleted', function () {
 
     actingAs($this->user)
         ->delete("/notes/{$note->id}")
-        ->assertRedirectBack();
+        ->assertRedirectBackWithoutErrors();
 
     assertDatabaseEmpty(Note::class);
 });
@@ -68,7 +75,7 @@ test('notes can be archived', function () {
 
     actingAs($this->user)
         ->put("/notes/{$note->id}/archive")
-        ->assertRedirectBack();
+        ->assertRedirectBackWithoutErrors();
 
     assertSoftDeleted($note);
 });
@@ -82,7 +89,7 @@ test('notes can be restored', function () {
 
     actingAs($this->user)
         ->put("/notes/{$note->id}/restore")
-        ->assertRedirectBack();
+        ->assertRedirectBackWithoutErrors();
 
     assertNotSoftDeleted($note);
 });

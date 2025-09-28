@@ -28,14 +28,17 @@ class NoteController extends Controller
     {
         $request->validate([
             'title' => ['required', 'string', 'max:25'],
+            'tags' => ['required', 'array'],
             'content' => ['required', 'string', 'max:200'],
         ]);
 
-        Note::create([
+        $note = Note::create([
             'user_id' => $request->user()->id,
             'title' => $request->string('title'),
             'content' => $request->string('content'),
         ]);
+
+        $note->tags()->attach($request->array('tags.*.id'));
 
         return back();
     }
@@ -47,6 +50,7 @@ class NoteController extends Controller
     {
         $request->validate([
             'title' => ['required', 'string', 'max:25'],
+            'tags' => ['required', 'array'],
             'content' => ['required', 'string', 'max:200'],
         ]);
 
@@ -54,6 +58,8 @@ class NoteController extends Controller
             'title' => $request->string('title'),
             'content' => $request->string('content'),
         ]);
+
+        $note->tags()->sync($request->array('tags.*.id'));
 
         return back();
     }
