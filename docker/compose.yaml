@@ -1,0 +1,23 @@
+services:
+    php:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile
+        restart: always
+        ports:
+            - '80:80' # HTTP
+            - '443:443' # HTTPS
+            - '443:443/udp' # HTTP/3
+        volumes:
+            - caddy_data:/data
+            - caddy_config:/config
+            - ../database/database.sqlite:/app/database/database.sqlite
+        command: >
+            sh -c "
+                frankenphp run --config /etc/caddy/Caddyfile &
+                /usr/bin/supervisord -c /etc/supervisord.conf
+            "
+
+volumes:
+    caddy_data:
+    caddy_config:
