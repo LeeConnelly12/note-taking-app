@@ -22,7 +22,7 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 # Copy PHP dependencies first to leverage cache
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+RUN composer install --no-dev --optimize-autoloader
 
 # Copy Node dependencies first for caching
 COPY package.json package-lock.json ./
