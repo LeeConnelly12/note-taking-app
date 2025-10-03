@@ -1,6 +1,6 @@
 FROM dunglas/frankenphp
 
-ENV SERVER_NAME=note-taking-app.leeconnelly.dev
+ENV SERVER_NAME=notes.leeconnelly.dev
 
 WORKDIR /app
 
