@@ -27,4 +27,43 @@
 
     --color-red-500: #fb3748;
     --color-red-100: #ffd5d8;
+
+    --font-inter: 'Inter', sans-serif;
+    --font-noto-serif: 'Noto Serif', sans-serif;
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    font-variation-settings: 'opsz' 14 32;
+    src: url('/fonts/inter-regular.woff2') format('woff2-variations');
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: 100 900;
+    font-display: swap;
+    font-variation-settings: 'opsz' 14 32;
+    src: url('/fonts/inter-italic.woff2') format('woff2-variations');
+}
+
+@font-face {
+    font-family: 'Noto Serif';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    font-variation-settings: 'opsz' 14 32;
+    src: url('/fonts/noto-serif-regular.woff2') format('woff2-variations');
+}
+
+@font-face {
+    font-family: 'Noto Serif';
+    font-style: italic;
+    font-weight: 100 900;
+    font-display: swap;
+    font-variation-settings: 'opsz' 14 32;
+    src: url('/fonts/noto-serif-italic.woff2') format('woff2-variations');
 }
